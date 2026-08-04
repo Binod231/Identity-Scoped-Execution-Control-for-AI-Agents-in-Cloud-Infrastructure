@@ -11,6 +11,10 @@
 \usepackage{array}
 \usepackage{listings}
 \usepackage{url}
+\usepackage{tikz}
+\usetikzlibrary{matrix,positioning}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
 \usepackage{hyperref}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -19,6 +23,8 @@
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 \definecolor{ieeeblue}{RGB}{0,51,102}
 \definecolor{ieeered}{RGB}{204,0,0}
+\definecolor{cellgreen}{RGB}{220,245,220}
+\definecolor{cellred}{RGB}{255,220,220}
 
 \lstdefinestyle{mystyle}{
     backgroundcolor=\color{backcolour},   
@@ -133,7 +139,26 @@ ScopeGuard functions as an asynchronous reverse proxy server implemented in Fast
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.48\textwidth]{fig_ablation.png}
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    enlargelimits=0.2,
+    legend style={at={(0.5,-0.25)}, anchor=north,legend columns=-1},
+    ylabel={Percentage (\%)},
+    symbolic x coords={Passthrough, Tagging Only, ScopeGuard Full},
+    xtick=data,
+    nodes near coords,
+    nodes near coords align={vertical},
+    ymin=0, ymax=100,
+    width=0.48\textwidth,
+    height=5.2cm,
+    bar width=14pt
+]
+\addplot[fill=ieeered!70] coordinates {(Passthrough,0) (Tagging Only,0) (ScopeGuard Full,88)};
+\addplot[fill=ieeeblue!70] coordinates {(Passthrough,0) (Tagging Only,0) (ScopeGuard Full,2)};
+\legend{Adversarial Block Rate, Legitimate FPR}
+\end{axis}
+\end{tikzpicture}
 \caption{Empirical ablation performance comparison showing Adversarial Block Rate (\%) and Legitimate False Positive Rate (\%) across Passthrough, Tagging Only, and ScopeGuard Full enforcement modes.}
 \label{fig:ablation_performance}
 \end{figure}
@@ -217,14 +242,46 @@ We evaluate ScopeGuard across a 200-task benchmark suite (100 legitimate operati
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.48\textwidth]{fig_latency.png}
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    enlargelimits=0.25,
+    ylabel={Latency (ms)},
+    symbolic x coords={Passthrough, Tagging Only, ScopeGuard Full},
+    xtick=data,
+    nodes near coords,
+    nodes near coords align={vertical},
+    ymin=80, ymax=160,
+    width=0.48\textwidth,
+    height=5.2cm,
+    bar width=18pt
+]
+\addplot[fill=ieeeblue!60] coordinates {(Passthrough,129.2) (Tagging Only,111.2) (ScopeGuard Full,108.9)};
+\end{axis}
+\end{tikzpicture}
 \caption{Mean execution latency overhead (ms) across ablation operational modes, confirming sub-110ms processing performance.}
 \label{fig:latency_overhead}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.45\textwidth]{fig_confusion.png}
+\begin{tikzpicture}
+\matrix [matrix of nodes,
+        nodes={draw, minimum width=2.4cm, minimum height=1.8cm, align=center, anchor=center},
+        column 1/.style={nodes={fill=cellgreen}},
+        column 2/.style={nodes={fill=cellred}},
+        row 1/.style={nodes={font=\bfseries}},
+        row 2/.style={nodes={font=\bfseries}}] (m)
+{
+{[fill=cellgreen] \textbf{TP = 88}\\[0.5ex]\small Blocked Adv} & {[fill=cellred] \textbf{FN = 12}\\[0.5ex]\small Allowed Adv} \\
+{[fill=cellred] \textbf{FP = 2}\\[0.5ex]\small Blocked Leg} & {[fill=cellgreen] \textbf{TN = 98}\\[0.5ex]\small Allowed Leg} \\
+};
+
+\node[above=0.3cm of m-1-1.north west, anchor=south west] {\textbf{Predicted: Blocked}};
+\node[above=0.3cm of m-1-2.north west, anchor=south west] {\textbf{Predicted: Allowed}};
+\node[left=0.3cm of m-1-1.west, rotate=90, anchor=south] {\textbf{Actual: Adversarial}};
+\node[left=0.3cm of m-2-1.west, rotate=90, anchor=south] {\textbf{Actual: Legitimate}};
+\end{tikzpicture}
 \caption{Empirical Confusion Matrix for ScopeGuard Full enforcement mode across 200 evaluation tasks.}
 \label{fig:confusion_matrix}
 \end{figure}
