@@ -1,4 +1,4 @@
-\documentclass[10pt,journal,compsoc]{IEEEtran}
+\documentclass[conference]{IEEEtran}
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithmic}
@@ -21,7 +21,7 @@
 \lstdefinestyle{mystyle}{
     backgroundcolor=\color{backcolour},   
     commentstyle=\color{codegreen},
-    keywordstyle=\color{magenta},
+    keywordstyle=\color{blue},
     numberstyle=\tiny\color{codegray},
     stringstyle=\color{codepurple},
     basicstyle=\ttfamily\footnotesize,
@@ -45,36 +45,27 @@
     urlcolor=blue
 }
 
-\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
-    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
-
 \begin{document}
 
 \title{ScopeGuard: Identity-Scoped Execution Control and Dynamic Permission Authorization for Autonomous AI Agents in Cloud Infrastructure}
 
-\author{Binod~Prasad~Joshi
-\IEEEcompsocitemizethanks{\IEEEcompsocthanksitem B. P. Joshi is an Independent Graduate Researcher in Cloud Infrastructure Security and Agentic AI Systems.\protect\\
-E-mail: research@scopeguard.io}%
-\thanks{Manuscript created August 2026.}}
+\author{\IEEEauthorblockN{Binod Prasad Joshi}
+\IEEEauthorblockA{\textit{Independent Graduate Researcher in Cloud Infrastructure Security \& Agentic AI Systems}\\
+Email: research@scopeguard.io}
+}
 
-\markboth{IEEE Transactions on Dependable and Secure Computing,~Vol.~21, No.~4,~August~2026}%
-{Joshi: ScopeGuard: Identity-Scoped Execution Control for Autonomous AI Agents}
+\maketitle
 
-\IEEEtitleabstractindextext{%
 \begin{abstract}
-The rapid deployment of Large Language Model (LLM)-powered autonomous agents into enterprise cloud environments promises to automate complex Infrastructure-as-Code (IaC) provisioning, microservice auto-scaling, and security incident response. However, granting autonomous agents direct access to cloud control planes introduces severe governance and security vulnerabilities. When agents operate with static, broad Identity and Access Management (IAM) permissions, they exhibit unintended scope creep, succumb to indirect prompt injection attacks, and execute destructive operations without deterministic, session-level identity attribution. Existing access control paradigms—including static Role-Based Access Control (RBAC) and declarative Policy-as-Code engines (e.g., Open Policy Agent, AWS Cedar)—fail to dynamically infer minimal permission boundaries from natural language task objectives prior to execution. We present \textbf{ScopeGuard}, an asynchronous, identity-scoped authorization proxy and execution control framework for AI agents in cloud infrastructure. ScopeGuard intercepts outbound agent tool calls, injects cryptographically verifiable session identity metadata (Agent ID, Session UUID4, declared task objective, and LLM reasoning chain), redacts credential secrets from parameter payloads, and dynamically compiles a task-aware permission boundary using a structured action taxonomy. Intercepted API calls are evaluated against this scope under a fail-closed policy engine supporting three ablation operational modes (\textit{passthrough}, \textit{tagging\_only}, and \textit{full}). We empirically evaluate ScopeGuard across a 200-task benchmark suite (100 legitimate infrastructure operations and 100 adversarial/off-scope attacks across 10 security threat categories). In \textit{full} enforcement mode, ScopeGuard achieves an overall classification accuracy of \textbf{89.0\%}, a scoping precision of \textbf{97.8\%}, an adversarial block rate of \textbf{88.0\%}, and a false positive rate of \textbf{2.0\%} on legitimate tasks, while introducing a minimal average proxy latency overhead of \textbf{108.9 ms}—well within the 200 ms real-time inference limit. We validate live execution against real Amazon Web Services (AWS) endpoints including Amazon RDS, EC2, S3, and CloudWatch.
+The rapid deployment of Large Language Model (LLM)-powered autonomous agents into enterprise cloud environments promises to automate complex Infrastructure-as-Code (IaC) provisioning, microservice auto-scaling, and operational incident response. However, granting autonomous agents direct access to cloud control planes introduces severe governance and security vulnerabilities. When agents operate with static, broad Identity and Access Management (IAM) permissions, they exhibit unintended scope creep, succumb to indirect prompt injection attacks, and execute destructive operations without deterministic, session-level identity attribution. Existing access control paradigms—including static Role-Based Access Control (RBAC) and declarative Policy-as-Code engines (e.g., Open Policy Agent, AWS Cedar)—fail to dynamically infer minimal permission boundaries from natural language task objectives prior to execution. We present \textbf{ScopeGuard}, an asynchronous, identity-scoped authorization proxy and execution control framework for AI agents in cloud infrastructure. ScopeGuard intercepts outbound agent tool calls, injects cryptographically verifiable session identity metadata (Agent ID, Session UUID4, declared task objective, and LLM reasoning chain), redacts credential secrets from parameter payloads, and dynamically compiles a task-aware permission boundary using a structured action taxonomy. Intercepted API calls are evaluated against this scope under a fail-closed policy engine supporting three ablation operational modes (\textit{passthrough}, \textit{tagging\_only}, and \textit{full}). We empirically evaluate ScopeGuard across a 200-task benchmark suite (100 legitimate infrastructure operations and 100 adversarial/off-scope attacks across 10 security threat categories). In \textit{full} enforcement mode, ScopeGuard achieves an overall classification accuracy of \textbf{89.0\%}, a scoping precision of \textbf{97.8\%}, an adversarial block rate of \textbf{88.0\%}, and a false positive rate of \textbf{2.0\%} on legitimate tasks, while introducing a minimal average proxy latency overhead of \textbf{108.9 ms}—well within the 200 ms real-time inference limit. We validate live execution against real Amazon Web Services (AWS) endpoints including Amazon RDS, EC2, S3, and CloudWatch.
 \end{abstract}
 
 \begin{IEEEkeywords}
-AI Agent Security, Infrastructure Access Control, Cloud Governance, Prompt Injection Defense, Least Privilege, Real-Time Authorization Proxy, AWS Identity Scoping, Empirical Security Benchmark.
-\end{IEEEkeywords}}
-
-\maketitle
-\IEEEdisplaynontitleabstractindextext
-\IEEEpeerreviewmaketitle
+AI Agent Security, Infrastructure Access Control, Cloud Governance, Prompt Injection Defense, Principle of Least Privilege, Real-Time Authorization Proxy, AWS Identity Scoping, Empirical Security Benchmark.
+\end{IEEEkeywords}
 
 \section{Introduction}\label{sec:intro}
-\IEEEPARstart{C}{loud} infrastructure control planes—such as Amazon Web Services (AWS), Google Cloud Platform (GCP), Microsoft Azure, and Infrastructure-as-Code (IaC) tools like Terraform—manage compute instances, relational databases, object storage, and Virtual Private Cloud (VPC) topologies \cite{ayers2018}, \cite{jiang2026}, \cite{hadary2020}. Managing these modern microservice deployments requires executing multi-step operational tasks via RESTful APIs, CLI tools, and automation pipelines \cite{cortez2017}, \cite{huye2023}. As enterprise architectures expand in heterogeneity and scale, human operators face severe operational overhead, driving the adoption of agentic AI frameworks \cite{yang2024}, \cite{hong2024}.
+Cloud infrastructure control planes—such as Amazon Web Services (AWS), Google Cloud Platform (GCP), Microsoft Azure, and Infrastructure-as-Code (IaC) tools like Terraform—manage compute instances, relational databases, object storage, and Virtual Private Cloud (VPC) topologies \cite{ayers2018}, \cite{jiang2026}, \cite{hadary2020}. Managing these modern microservice deployments requires executing multi-step operational tasks via RESTful APIs, CLI tools, and automation pipelines \cite{cortez2017}, \cite{huye2023}. As enterprise architectures expand in heterogeneity and scale, human operators face severe operational overhead, driving the adoption of agentic AI frameworks \cite{yang2024}, \cite{hong2024}.
 
 Autonomous AI agents—LLM-based software systems capable of iterative goal reasoning, action planning, and external tool invocation \cite{schick2023}, \cite{yao2023}, \cite{shavit2023}—are increasingly deployed to manage cloud infrastructure, automate database auto-scaling, and execute continuous integration pipelines \cite{lange2025}, \cite{novikov2025}. Rather than executing pre-scripted static workflows, AI agents dynamically infer multi-step plan sequences to achieve natural language objectives.
 
@@ -106,7 +97,7 @@ RIVA (2026) & \textbf{No} (Post-hoc Drift) & \textbf{No} & \textbf{N/A} & \textb
 \subsection{Novelty Claim and Contributions}
 To address these security failures, we introduce \textbf{ScopeGuard}, an identity-scoped authorization proxy that dynamically computes permission scopes from natural language task prompts and enforces fail-closed policy authorization prior to API execution.
 
-> \textbf{Novelty Claim:} ScopeGuard is the \textbf{first working, empirically tested implementation} of task-scoped dynamic permission enforcement + runtime identity attribution specifically designed for AI-agent-driven cloud infrastructure actions, evaluated against injected malicious/off-scope behavior across a 200-task benchmark suite.
+\textbf{Novelty Claim:} ScopeGuard is the \textit{first working, empirically tested implementation} of task-scoped dynamic permission enforcement + runtime identity attribution specifically designed for AI-agent-driven cloud infrastructure actions, evaluated against injected malicious/off-scope behavior across a 200-task benchmark suite.
 
 This paper makes the following key scientific and technical contributions:
 \begin{itemize}
@@ -140,7 +131,7 @@ ScopeGuard functions as an asynchronous reverse proxy server implemented in Fast
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.48\textwidth]{experiments/results/ablation_performance.png}
+\includegraphics[width=0.48\textwidth]{fig_ablation.png}
 \caption{Empirical ablation performance comparison showing Block Rate and False Positive Rate across Passthrough, Tagging Only, and ScopeGuard Full enforcement modes.}
 \label{fig:ablation_performance}
 \end{figure}
@@ -224,14 +215,14 @@ We evaluate ScopeGuard across a 200-task benchmark suite (100 legitimate operati
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.48\textwidth]{experiments/results/latency_overhead.png}
+\includegraphics[width=0.48\textwidth]{fig_latency.png}
 \caption{Boxplot distribution of proxy execution latency overhead across ablation operational modes, confirming sub-110ms processing performance.}
 \label{fig:latency_overhead}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.45\textwidth]{experiments/results/confusion_matrix_full.png}
+\includegraphics[width=0.45\textwidth]{fig_confusion.png}
 \caption{Confusion matrix heat map for ScopeGuard Full enforcement mode across 200 evaluation tasks.}
 \label{fig:confusion_matrix}
 \end{figure}
