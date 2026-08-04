@@ -44,9 +44,10 @@ Cloud Backend     Blocked Response
 (LocalStack/AWS)  (Structured Error)
 ```
 
-For full architecture and sequence diagrams, see:
+For full architecture, sequence diagrams, and literature review, see:
 - [`docs/architecture.md`](docs/architecture.md)
 - [`docs/sequence.md`](docs/sequence.md)
+- [`docs/literature_review.md`](docs/literature_review.md)
 
 ---
 
