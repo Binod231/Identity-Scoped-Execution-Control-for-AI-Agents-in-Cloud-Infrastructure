@@ -11,12 +11,17 @@
 \usepackage{array}
 \usepackage{listings}
 \usepackage{url}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
 \usepackage{hyperref}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{ieeeblue}{RGB}{0,51,102}
+\definecolor{ieeered}{RGB}{204,0,0}
 
 \lstdefinestyle{mystyle}{
     backgroundcolor=\color{backcolour},   
@@ -131,8 +136,27 @@ ScopeGuard functions as an asynchronous reverse proxy server implemented in Fast
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.48\textwidth]{fig_ablation.png}
-\caption{Empirical ablation performance comparison showing Block Rate and False Positive Rate across Passthrough, Tagging Only, and ScopeGuard Full enforcement modes.}
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    enlargelimits=0.2,
+    legend style={at={(0.5,-0.25)}, anchor=north,legend columns=-1},
+    ylabel={Percentage (\%)},
+    symbolic x coords={Passthrough, Tagging Only, ScopeGuard Full},
+    xtick=data,
+    nodes near coords,
+    nodes near coords align={vertical},
+    ymin=0, ymax=100,
+    width=0.48\textwidth,
+    height=5cm,
+    bar width=14pt
+]
+\addplot[fill=ieeered!70] coordinates {(Passthrough,0) (Tagging Only,0) (ScopeGuard Full,88)};
+\addplot[fill=ieeeblue!70] coordinates {(Passthrough,0) (Tagging Only,0) (ScopeGuard Full,2)};
+\legend{Adversarial Block Rate, Legitimate FPR}
+\end{axis}
+\end{tikzpicture}
+\caption{Empirical ablation performance comparison showing Adversarial Block Rate (\%) and Legitimate False Positive Rate (\%) across Passthrough, Tagging Only, and ScopeGuard Full enforcement modes.}
 \label{fig:ablation_performance}
 \end{figure}
 
@@ -215,15 +239,41 @@ We evaluate ScopeGuard across a 200-task benchmark suite (100 legitimate operati
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.48\textwidth]{fig_latency.png}
-\caption{Boxplot distribution of proxy execution latency overhead across ablation operational modes, confirming sub-110ms processing performance.}
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    enlargelimits=0.25,
+    ylabel={Latency (ms)},
+    symbolic x coords={Passthrough, Tagging Only, ScopeGuard Full},
+    xtick=data,
+    nodes near coords,
+    nodes near coords align={vertical},
+    ymin=80, ymax=160,
+    width=0.48\textwidth,
+    height=5.2cm,
+    bar width=18pt
+]
+\addplot[fill=ieeeblue!60] coordinates {(Passthrough,129.2) (Tagging Only,111.2) (ScopeGuard Full,108.9)};
+\end{axis}
+\end{tikzpicture}
+\caption{Mean execution latency overhead (ms) across ablation operational modes, confirming sub-110ms processing performance.}
 \label{fig:latency_overhead}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.45\textwidth]{fig_confusion.png}
-\caption{Confusion matrix heat map for ScopeGuard Full enforcement mode across 200 evaluation tasks.}
+\begin{tikzpicture}[scale=0.85]
+\draw[thick] (0,0) rectangle (4,4);
+\draw[thick] (2,0) -- (2,4);
+\draw[thick] (0,2) -- (4,2);
+\node at (1,3) [align=center] {\textbf{TP = 88}\\\small(Blocked Adv)};
+\node at (3,3) [align=center] {\textbf{FN = 12}\\\small(Allowed Adv)};
+\node at (1,1) [align=center] {\textbf{FP = 2}\\\small(Blocked Leg)};
+\node at (3,1) [align=center] {\textbf{TN = 98}\\\small(Allowed Leg)};
+\node[above] at (2,4) {\textbf{Actual Class}};
+\node[left] at (0,2) {\textbf{Predicted Decision}};
+\end{tikzpicture}
+\caption{Confusion matrix heat map structure for ScopeGuard Full enforcement mode across 200 evaluation tasks.}
 \label{fig:confusion_matrix}
 \end{figure}
 
@@ -278,6 +328,7 @@ ScopeGuard bridges the critical security gap between autonomous AI agent capabil
 \bibitem{perez2023} F. Perez and I. Ribeiro, ``Ignore This Title is False: Data Extraction and Action Injections in LLM Agents,'' \textit{arXiv:2311.13348}, 2023.
 \bibitem{riva2026} RIVA Research Group, ``Multi-Agent Verification for Infrastructure Configuration Drift,'' \textit{IEEE Cloud Computing}, 2026.
 \bibitem{nist2026} NIST AI Agent Standards Initiative, ``Draft Framework for AI Agent Identity and Authorization Boundaries,'' National Institute of Standards and Technology, Feb 2026.
+\bibitem{fig_ablation} If `fig_ablation.png` is uploaded to Overleaf, `\includegraphics` renders raster charts directly.
 \end{thebibliography}
 
 \end{document}
