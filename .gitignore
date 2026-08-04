@@ -43,11 +43,9 @@ experiments/results/*.json
 data/*.db
 data/*.csv
 
-# Temporary & Generated Paper Artifacts (Kept locally, excluded from GitHub)
+# Temporary & Paper Artifacts (Kept locally on device, excluded from GitHub)
+paper/
 paperformat.pdf
-paper/*.docx
-paper/*.md
-paper/*.png
 research-plan-final.md
 
 # OS
