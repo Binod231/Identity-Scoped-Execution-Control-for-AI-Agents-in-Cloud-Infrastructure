@@ -49,7 +49,8 @@
 \hypersetup{
     colorlinks=true,
     linkcolor=blue,
-    citecolor=blue,urlcolor=blue
+    citecolor=blue,
+    urlcolor=blue
 }
 
 \begin{document}
@@ -78,10 +79,10 @@ Modern enterprise computing relies heavily on cloud infrastructure control plane
 
 Autonomous AI agents—Large Language Model (LLM)-powered software systems capable of iterative goal reasoning, action planning, context retrieval, and external tool invocation \cite{schick2023}, \cite{yao2023}, \cite{shavit2023}—are increasingly granted direct API access to manage live enterprise cloud environments. These agents automate incident remediation, database auto-scaling, application log diagnosis, and IaC template generation \cite{lange2025}, \cite{novikov2025}. Unlike pre-scripted, deterministic automation workflows, autonomous agents dynamically generate execution plan graphs to accomplish high-level natural language instructions.
 
-\subsection{The Dilemma of Static IAM in Agentic Workflows}
-However, granting autonomous agents direct, unmediated access to cloud control planes introduces fundamental security failure modes. Cloud Identity and Access Management (IAM) systems are built around static policy assignment to IAM users, service roles, or container service accounts. Static IAM policies assume predictable, well-defined service boundaries.
+However, granting autonomous agents direct, unmediated access to cloud control planes introduces fundamental security failure modes. Cloud Identity and Access Management (IAM) systems are built around static policy assignment to IAM users, service roles, or container service accounts. Static IAM policies assume predictable, well-defined service boundaries. When applied to autonomous LLM agents, static IAM policies create an insurmountable security dilemma.
 
-When applied to autonomous LLM agents, static IAM policies create an insurmountable security dilemma:
+\subsection{The Dilemma of Static IAM in Agentic Workflows}
+The fundamental conflict in agentic access control arises from the operational tension between agent autonomy and the security Principle of Least Privilege:
 \begin{itemize}
     \item \textbf{Over-Provisioning Hazard}: Granting broad permissions (e.g., \texttt{AdministratorAccess} or wildcard \texttt{s3:*}) ensures that the agent can autonomously complete diverse, multi-step operational tasks without encountering authorization errors. However, this leaves the entire cloud infrastructure vulnerable to catastrophic deletion if the agent hallucinates, exhibits scope creep, or is compromised by an adversary.
     \item \textbf{Under-Provisioning Failure}: Restricting IAM permissions prevents unauthorized actions, but causes frequent runtime execution failures whenever an LLM dynamically selects an alternative valid tool path or auxiliary read command to fulfill a legitimate user objective.
@@ -136,8 +137,14 @@ The key scientific and technical contributions of this work are:
 \subsection{Anatomy of Autonomous Cloud Agents}
 Autonomous AI agents operate via iterative reasoning loops, such as the ReAct (Reasoning + Acting) framework \cite{yao2023}. At each execution step $t$, the agent receives a prompt tuple $P_t = \langle T_{\text{user}}, H_{t-1}, O_{t-1} \rangle$, where $T_{\text{user}}$ represents the user's natural language objective, $H_{t-1}$ is the historical trajectory of thoughts and actions, and $O_{t-1}$ is the observation output from the preceding tool invocation. The agent invokes an LLM to generate a thought $c_t$ and an action command $a_t$. The action command specifies a tool name and parameters (e.g., `aws_rds_operation(action="rds:DescribeDBInstances")`).
 
-\subsection{Formal Threat Model}
-We define a formal security threat model $\mathcal{M}_{\text{threat}}$ governing AI agent cloud interactions. The threat model assumes:
+\subsection{Formal Security Threat Model ($\mathcal{M}_{\text{threat}}$)}
+We define a formal security threat model $\mathcal{M}_{\text{threat}}$ governing AI agent cloud interactions:
+\begin{equation}
+\mathcal{M}_{\text{threat}} = \langle \mathcal{A}_{\text{adv}}, \mathcal{S}_{\text{target}}, \mathcal{T}_{\text{vectors}}, \mathcal{B}_{\text{trust}} \rangle
+\end{equation}
+where $\mathcal{A}_{\text{adv}}$ denotes adversary capabilities, $\mathcal{S}_{\text{target}}$ is the target cloud infrastructure API surface, $\mathcal{T}_{\text{vectors}}$ represents the threat vectors, and $\mathcal{B}_{\text{trust}}$ defines the trust boundaries.
+
+The threat model assumes:
 \begin{enumerate}
     \item \textbf{Attacker Capabilities}: The adversary can submit arbitrary natural language user prompts or manipulate untrusted data inputs (logs, code repos, S3 metadata) ingested by the agent. The adversary cannot modify ScopeGuard's internal code or proxy configuration.
     \item \textbf{Agent Trust Stance}: The agent's LLM is treated as an untrusted reasoning component susceptible to hallucinations, prompt injections, and scope creep.
@@ -145,7 +152,7 @@ We define a formal security threat model $\mathcal{M}_{\text{threat}}$ governing
 \end{enumerate}
 
 \subsection{Ten Security Threat Categories}
-We establish a taxonomy of ten security threat categories targeting cloud AI agents:
+We establish a comprehensive taxonomy of ten security threat categories targeting cloud AI agents:
 \begin{enumerate}
     \item \textbf{Scope Creep (Off-Scope Action Execution)}: The agent attempts API calls unrelated to its stated task (e.g., deleting S3 storage buckets during a read-only database health monitoring task).
     \item \textbf{Direct Prompt Injection}: An attacker manipulates the user prompt to force unauthorized execution.
@@ -155,8 +162,8 @@ We establish a taxonomy of ten security threat categories targeting cloud AI age
     \item \textbf{Unauthorized Ingress Security Expansion}: The agent opens internal infrastructure security groups to global internet access (\texttt{ec2:AuthorizeSecurityGroupIngress} with \texttt{0.0.0.0/0}).
     \item \textbf{Unauthorized Secret and Credential Exfiltration}: The agent attempts to read or transmit API secrets, database passwords, or private SSH keys.
     \item \textbf{Cross-Resource / Cross-Tenant Scope Leakage}: The agent accesses infrastructure resources belonging to distinct tenant isolation environments.
-    \item \textbf{Denial-of-Wallet & Infinite Loop Resource Exhaustion}: The agent generates runaway resource provisioning commands (e.g., spinning up hundreds of GPU instances).
-    \item \textbf{Audit Log Tampering & Bypassing}: The agent attempts to disable CloudTrail or delete proxy audit logs.
+    \item \textbf{Denial-of-Wallet \& Infinite Loop Resource Exhaustion}: The agent generates runaway resource provisioning commands (e.g., spinning up hundreds of GPU instances).
+    \item \textbf{Audit Log Tampering \& Bypassing}: The agent attempts to disable CloudTrail or delete proxy audit logs.
 \end{enumerate}
 
 \section{ScopeGuard Architecture and System Design}\label{sec:architecture}
@@ -232,6 +239,60 @@ Listing \ref{lst:execute_tool_payload} shows an intercepted tool execution reque
   "tool_action": "rds:DescribeDBInstances",
   "tool_params": {}
 }
+\end{lstlisting}
+
+Listing \ref{lst:proxy_core} highlights the core asynchronous request handler and secret redaction pipeline implementation in FastAPI.
+
+\begin{lstlisting}[language=python, caption={ScopeGuard Proxy Engine Request Interceptor (\texttt{proxy/app.py}).}, label={lst:proxy_core}]
+@app.post("/execute-tool")
+async def execute_tool(req: ToolExecutionRequest):
+    # 1. Redact sensitive credentials from payload parameters
+    sanitized_params = secret_redactor.redact(req.tool_params)
+    
+    # 2. Inject verifiable session identity attribution headers
+    session_ctx = {
+        "agent_id": req.agent_id,
+        "session_id": req.session_id or str(uuid.uuid4()),
+        "declared_task": req.declared_task,
+        "timestamp": datetime.utcnow().isoformat()
+    }
+    
+    # 3. Compile dynamic permission scope from declared task
+    allowed_scope = task_compiler.compile_scope(req.declared_task)
+    
+    # 4. Evaluate fail-closed authorization policy
+    decision = policy_engine.evaluate(
+        requested_action=req.tool_action,
+        allowed_scope=allowed_scope,
+        mode=config.SCOPEGUARD_MODE
+    )
+    
+    # 5. Persist audit log record to SQLite database
+    audit_logger.log(session_ctx, req.tool_action, decision)
+    
+    if decision == "DENY":
+        raise HTTPException(status_code=403, detail=f"ScopeGuard Blocked: Action {req.tool_action} is outside allowed scope.")
+        
+    return await forward_to_cloud_api(req.tool_name, req.tool_action, sanitized_params)
+\end{lstlisting}
+
+Listing \ref{lst:audit_db_schema} illustrates the SQL schema definition used for persistent forensic audit logging in SQLite.
+
+\begin{lstlisting}[language=sql, caption={Persistent Forensic Audit Log Schema (\texttt{proxy/audit.db}).}, label={lst:audit_db_schema}]
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    agent_id TEXT NOT NULL,
+    session_id TEXT NOT NULL,
+    declared_task TEXT NOT NULL,
+    tool_action TEXT NOT NULL,
+    decision TEXT NOT NULL,
+    mode TEXT NOT NULL,
+    sanitized_params TEXT,
+    allowed_scope TEXT
+);
+CREATE INDEX idx_session ON audit_logs(session_id);
+CREATE INDEX idx_agent ON audit_logs(agent_id);
 \end{lstlisting}
 
 \section{Dynamic Task-to-Scope Compiler}\label{sec:compiler}
@@ -421,7 +482,7 @@ Our empirical evaluation across a 200-task security benchmark suite (600 total t
 Future work will expand ScopeGuard along four key dimensions:
 \begin{enumerate}
     \item \textbf{Semantic Embedding-Based Scope Inference}: Transitioning from keyword tokenization to dense vector embedding similarity for taxonomy compilation.
-    \item \textbf{Kubernetes Sidecar & Envoy Integration}: Packaging ScopeGuard as a cloud-native sidecar proxy for containerized agent workloads in EKS and GKE.
+    \item \textbf{Kubernetes Sidecar \& Envoy Integration}: Packaging ScopeGuard as a cloud-native sidecar proxy for containerized agent workloads in EKS and GKE.
     \item \textbf{Cryptographic Reasoning Verification}: Integrating zero-knowledge cryptographic proofs to bind LLM reasoning chain steps directly to policy evaluation decisions.
     \item \textbf{eBPF Kernel Interception}: Intercepting socket-level agent API calls using eBPF probes for zero-overhead system governance.
 \end{enumerate}
