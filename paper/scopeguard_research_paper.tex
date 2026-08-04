@@ -262,16 +262,18 @@ We evaluate ScopeGuard across a 200-task benchmark suite (100 legitimate operati
 
 \begin{figure}[htbp]
 \centering
-\begin{tikzpicture}[scale=0.85]
-\draw[thick] (0,0) rectangle (4,4);
-\draw[thick] (2,0) -- (2,4);
-\draw[thick] (0,2) -- (4,2);
-\node at (1,3) [align=center] {\textbf{TP = 88}\\\small(Blocked Adv)};
-\node at (3,3) [align=center] {\textbf{FN = 12}\\\small(Allowed Adv)};
-\node at (1,1) [align=center] {\textbf{FP = 2}\\\small(Blocked Leg)};
-\node at (3,1) [align=center] {\textbf{TN = 98}\\\small(Allowed Leg)};
-\node[above] at (2,4) {\textbf{Actual Class}};
-\node[left] at (0,2) {\textbf{Predicted Decision}};
+\begin{tikzpicture}[scale=1.0]
+\draw[thick, fill=gray!10] (0,0) rectangle (5.2,4.8);
+\draw[thick] (2.6,0) -- (2.6,4.8);
+\draw[thick] (0,2.4) -- (5.2,2.4);
+
+\node at (1.3,3.6) [align=center] {\Large\textbf{TP = 88}\\[0.4ex]\footnotesize (Blocked Adv)};
+\node at (3.9,3.6) [align=center] {\Large\textbf{FN = 12}\\[0.4ex]\footnotesize (Allowed Adv)};
+\node at (1.3,1.2) [align=center] {\Large\textbf{FP = 2}\\[0.4ex]\footnotesize (Blocked Leg)};
+\node at (3.9,1.2) [align=center] {\Large\textbf{TN = 98}\\[0.4ex]\footnotesize (Allowed Leg)};
+
+\node[above] at (2.6,4.8) {\small\textbf{Actual Ground Truth Class}};
+\node[rotate=90, above] at (0,2.4) {\small\textbf{Predicted Proxy Decision}};
 \end{tikzpicture}
 \caption{Confusion matrix heat map structure for ScopeGuard Full enforcement mode across 200 evaluation tasks.}
 \label{fig:confusion_matrix}
@@ -328,7 +330,6 @@ ScopeGuard bridges the critical security gap between autonomous AI agent capabil
 \bibitem{perez2023} F. Perez and I. Ribeiro, ``Ignore This Title is False: Data Extraction and Action Injections in LLM Agents,'' \textit{arXiv:2311.13348}, 2023.
 \bibitem{riva2026} RIVA Research Group, ``Multi-Agent Verification for Infrastructure Configuration Drift,'' \textit{IEEE Cloud Computing}, 2026.
 \bibitem{nist2026} NIST AI Agent Standards Initiative, ``Draft Framework for AI Agent Identity and Authorization Boundaries,'' National Institute of Standards and Technology, Feb 2026.
-\bibitem{fig_ablation} If `fig_ablation.png` is uploaded to Overleaf, `\includegraphics` renders raster charts directly.
 \end{thebibliography}
 
 \end{document}
