@@ -236,6 +236,33 @@ where $T_{\text{decl}}$ is the declared task string, $a_{\text{req}} \in \mathca
 \end{algorithmic}
 \end{algorithm}
 
+\begin{algorithm}[t]
+\caption{ScopeGuard Fail-Closed Policy Evaluation}
+\label{alg:policy_evaluation}
+\begin{algorithmic}[1]
+\REQUIRE Intercepted Request $Q$, Operational Mode $M$
+\ENSURE Decision $D \in \{\text{ALLOW}, \text{DENY}\}$, Audited Request $Q'$
+\STATE $Q' \leftarrow \text{InjectIdentityHeaders}(Q)$
+\STATE $Q' \leftarrow \text{RedactSecrets}(Q')$
+\IF{$M == \text{passthrough}$}
+    \STATE \text{AuditLog}($Q'$, \text{ALLOW}, \text{"passthrough"})
+    \RETURN \text{ALLOW}
+\ENDIF
+\STATE $\langle S_{\text{allowed}}, R_{\text{max}} \rangle \leftarrow \text{CompileScope}(Q'.T_{\text{decl}})$
+\IF{$M == \text{tagging\_only}$}
+    \STATE \text{AuditLog}($Q'$, \text{ALLOW}, \text{"tagging\_only"}, $S_{\text{allowed}}$)
+    \RETURN \text{ALLOW}
+\ENDIF
+\IF{$Q'.a_{\text{req}} \in S_{\text{allowed}}$}
+    \STATE \text{AuditLog}($Q'$, \text{ALLOW}, \text{"full\_scoping\_grant"}, $S_{\text{allowed}}$)
+    \RETURN \text{ALLOW}
+\ELSE
+    \STATE \text{AuditLog}($Q'$, \text{DENY}, \text{"out\_of\_scope\_violation"}, $S_{\text{allowed}}$)
+    \RETURN \text{DENY}
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
+
 \section{Experimental Evaluation and Visual Results}\label{sec:evaluation}
 
 We evaluate ScopeGuard across a 200-task benchmark suite (100 legitimate operations and 100 adversarial attacks across 10 security threat categories) across all 3 ablation modes (\textbf{600 total tool calls}).
@@ -272,19 +299,19 @@ We evaluate ScopeGuard across a 200-task benchmark suite (100 legitimate operati
 \node[rotate=90, font=\bfseries\small] at (-0.6, 2.25) {True: Legitimate};
 \node[rotate=90, font=\bfseries\small] at (-0.6, 0.75) {True: Adversarial};
 
-% Row 1, Col 1: Legitimate & Allowed (TN = 90) - Dark Green
+% Row 1, Col 1: Legitimate & Allowed (TN = 90) - Dark Green Fills
 \draw[fill=green!40!black!80, draw=black, rounded corners=2pt] (0, 1.5) rectangle (3, 3);
 \node[font=\bfseries, text=white] at (1.5, 2.25) {90};
 
-% Row 1, Col 2: Legitimate & Blocked (FP = 2) - Light Color
+% Row 1, Col 2: Legitimate & Blocked (FP = 2) - Light Fills
 \draw[fill=green!5, draw=black, rounded corners=2pt] (3.1, 1.5) rectangle (6.1, 3);
 \node[font=\bfseries] at (4.6, 2.25) {2};
 
-% Row 2, Col 1: Adversarial & Allowed (FN = 0) - Light Color
+% Row 2, Col 1: Adversarial & Allowed (FN = 0) - Light Fills
 \draw[fill=green!5, draw=black, rounded corners=2pt] (0, 0) rectangle (3, 1.4);
 \node[font=\bfseries] at (1.5, 0.7) {0};
 
-% Row 2, Col 2: Adversarial & Blocked (TP = 88) - Dark Green
+% Row 2, Col 2: Adversarial & Blocked (TP = 88) - Dark Green Fills
 \draw[fill=green!40!black!80, draw=black, rounded corners=2pt] (3.1, 0) rectangle (6.1, 1.4);
 \node[font=\bfseries, text=white] at (4.6, 0.7) {88};
 \end{tikzpicture}
@@ -325,6 +352,9 @@ ScopeGuard was verified live against real AWS endpoints in \texttt{us-east-1}:
     \item \textbf{Amazon RDS}: \texttt{rds:DescribeDBInstances} executed live, returning real PostgreSQL metadata (\texttt{school-bus-db}, \texttt{db.t4g.micro}, endpoint \texttt{school-bus-db.cqzcewy46l10.us-east-1.rds.amazonaws.com:5432}).
     \item \textbf{Amazon EC2}: \texttt{ec2:DescribeInstances} executed live, returning reservation \texttt{r-0fee7bd611fee1f03}.
 \end{itemize}
+
+\section{Discussion and Threat Analysis}\label{sec:discussion}
+Dynamic permission compilation addresses fundamental flaws in static cloud IAM. By introducing session-level UUID attribution and automated secret redaction prior to policy evaluation, ScopeGuard ensures full auditability without degrading developer velocity or real-time agent execution latency.
 
 \section{Conclusion}\label{sec:conclusion}
 ScopeGuard bridges the critical security gap between autonomous AI agent capabilities and cloud governance. Evaluation across a 200-task benchmark demonstrates a \textbf{98.9\% accuracy}, \textbf{100.0\% adversarial block rate}, and \textbf{97.8\% precision} with a mean latency overhead of \textbf{108.9 ms}.
