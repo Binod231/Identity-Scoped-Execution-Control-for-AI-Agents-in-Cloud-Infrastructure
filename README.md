@@ -62,7 +62,7 @@ Evaluated across a benchmark task dataset of **200 infrastructure tasks** (100 l
 | **F1 Score** | 0.00 | 0.00 | **0.926** |
 | **Adversarial Block Rate** | 0.0% | 0.0% | **88.0%** |
 | **Legitimate False Positive Rate** | 0.0% | 0.0% | **2.0%** |
-| **Avg Latency Overhead** | 147.6 ms | 160.0 ms | **153.1 ms** (< 200 ms target) |
+| **Avg Latency Overhead** | 129.2 ms | 111.2 ms | **108.9 ms** (< 200 ms target) |
 
 All visual plots (block rate, latency boxplots, confusion matrix) are generated in `experiments/results/`.
 
