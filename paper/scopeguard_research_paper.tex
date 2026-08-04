@@ -86,6 +86,7 @@ However, granting autonomous agents direct, unmediated access to cloud APIs intr
 \caption{Systemic Comparison of Access Control Paradigms for Autonomous AI Agents in Cloud Infrastructure}
 \label{tab:systemic_comparison}
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lccccc}
 \toprule
 \textbf{Control Paradigm} & \textbf{Dynamic Task Scoping} & \textbf{Runtime Identity Attribution} & \textbf{Sub-200ms Overhead} & \textbf{Cloud API Awareness} & \textbf{Active Pre-Execution Block} \\
@@ -97,7 +98,8 @@ NVIDIA NeMo Guardrails & \textbf{No} (Text Content Only) & \textbf{Partial} (Ses
 RIVA (2026) & \textbf{No} (Post-hoc Drift) & \textbf{No} & \textbf{N/A} & \textbf{Yes} & \textbf{No} (Post-execution) \\
 \textbf{ScopeGuard (Ours)} & \textbf{YES (Task-Aware)} & \textbf{YES (UUID4 + Task + Chain)} & \textbf{YES (108.9ms Avg)} & \textbf{YES (AWS/Terraform)} & \textbf{YES (Fail-Closed Proxy)} \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table*}
 
 \subsection{Novelty Claim and Contributions}
@@ -294,6 +296,7 @@ We evaluate ScopeGuard across a 200-task benchmark suite (100 legitimate operati
 \caption{ScopeGuard Ablation Evaluation Metrics (600 Tool Calls)}
 \label{tab:ablation_results_detail}
 \begin{center}
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lrrr}
 \toprule
 \textbf{Evaluation Metric} & \textbf{Passthrough} & \textbf{Tagging Only} & \textbf{ScopeGuard Full} \\
@@ -311,7 +314,8 @@ F1 Score & 0.000 & 0.000 & \textbf{0.989} \\
 False Positive Rate (FPR) & 0.0\% & 0.0\% & \textbf{2.1\%} \\
 Mean Proxy Latency Overhead & 129.2 ms & 111.2 ms & \textbf{108.9 ms} \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{center}
 \end{table}
 
