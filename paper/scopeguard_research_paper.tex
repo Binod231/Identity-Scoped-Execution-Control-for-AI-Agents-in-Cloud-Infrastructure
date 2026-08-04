@@ -15,6 +15,8 @@
 \usetikzlibrary{positioning}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
+\usepackage{stfloats}
+\usepackage{placeins}
 \usepackage{hyperref}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -378,6 +380,8 @@ ScopeGuard was validated live against real Amazon Web Services (AWS) control pla
     \item \textbf{Amazon EC2}: Intercepted \texttt{ec2:DescribeInstances}, compiled compute status scope, and returned live reservation \texttt{r-0fee7bd611fee1f03}.
 \end{itemize}
 
+\FloatBarrier
+
 \section{Discussion and Related Work}\label{sec:discussion}
 Existing access control systems fail to address the non-deterministic execution nature of LLM autonomous agents. Static IAM policies over-provision permissions, while OPA and AWS Cedar enforce static declarative policies that require human engineers to anticipate every potential query structure beforehand.
 
@@ -394,6 +398,8 @@ Future work will expand ScopeGuard along three key dimensions:
     \item \textbf{Kubernetes Sidecar & Envoy Integration}: Packaging ScopeGuard as a cloud-native sidecar proxy for containerized agent workloads in EKS and GKE.
     \item \textbf{Cryptographic Reasoning Verification}: Integrating zero-knowledge cryptographic proofs to bind LLM reasoning chain steps directly to policy evaluation decisions.
 \end{enumerate}
+
+\FloatBarrier
 
 \begin{thebibliography}{99}
 \bibitem{ayers2018} G. Ayers et al., ``Memory Hierarchy for Web Search,'' in \textit{Proc. IEEE HPCA}, 2018.
