@@ -1,0 +1,57 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+
+\begin{document}
+
+\title{ScopeGuard: Identity-Scoped Execution Control and Dynamic Permission Authorization for AI Agents in Cloud Infrastructure}
+
+\author{\IEEEauthorblockN{Binod Prasad Joshi}
+\IEEEauthorblockA{\textit{Department of Computer Science \& Cloud Infrastructure Security} \\
+\textit{Research Group}\\
+Email: research@scopeguard.io}
+}
+
+\maketitle
+
+\begin{abstract}
+The rapid integration of Large Language Model (LLM)-powered autonomous agents into cloud management workflows promises to automate complex infrastructure-as-code (IaC) provisioning, resource scaling, and operational monitoring. However, deploying off-the-shelf AI agents with static cloud credentials introduces severe security risks: agents granted broad Identity and Access Management (IAM) permissions can exhibit unintended scope creep, succumb to prompt injection attacks, or execute destructive actions without deterministic identity attribution. We present ScopeGuard, an asynchronous, identity-scoped proxy framework designed for real-time permission authorization and execution control of AI agents in cloud infrastructure. In full enforcement mode, ScopeGuard achieves an overall accuracy of 89.0\%, a scoping precision of 97.8\%, an adversarial block rate of 88.0\%, and a false positive rate of 2.0\%, with a minimal average latency overhead of 108.9 ms.
+\end{abstract}
+
+\begin{IEEEkeywords}
+AI Agent Security, Infrastructure Access Control, Cloud Governance, Prompt Injection Defense, Real-time Authorization Proxy.
+\end{IEEEkeywords}
+
+\section{Introduction}
+Cloud infrastructure environments are the foundation of modern digital applications, relying on complex control planes to manage compute instances, relational databases, object storage, and network topologies. Managing these resources requires executing multi-step infrastructure operations via Cloud APIs (e.g., AWS SDK boto3) and Infrastructure-as-Code CLI tools (e.g., Terraform).
+
+\section{System Architecture}
+ScopeGuard functions as an intercepting reverse proxy between an AI Agent execution environment and cloud infrastructure backends.
+
+\section{Experimental Evaluation}
+\begin{table}[htbp]
+\caption{ScopeGuard Ablation Evaluation Metrics (600 Tool Calls)}
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Metric} & \textbf{Passthrough} & \textbf{Tagging Only} & \textbf{ScopeGuard Full} \\
+\midrule
+Accuracy & 50.0\% & 50.0\% & \textbf{89.0\%} \\
+Precision & 0.00 & 0.00 & \textbf{0.978} \\
+Recall (Block Rate) & 0.00 & 0.00 & \textbf{0.880} \\
+FPR & 0.0\% & 0.0\% & \textbf{2.0\%} \\
+Latency Overhead & 129.2 ms & 111.2 ms & \textbf{108.9 ms} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\section{Conclusion}
+ScopeGuard bridges the critical security gap between autonomous agent capabilities and cloud governance, achieving high security efficacy with sub-110ms execution overhead.
+
+\end{document}
