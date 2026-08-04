@@ -49,8 +49,7 @@
 \hypersetup{
     colorlinks=true,
     linkcolor=blue,
-    citecolor=blue,
-    urlcolor=blue
+    citecolor=blue,urlcolor=blue
 }
 
 \begin{document}
@@ -73,18 +72,30 @@ AI Agent Security, Infrastructure Access Control, Cloud Governance, Prompt Injec
 \end{IEEEkeywords}
 
 \section{Introduction}\label{sec:intro}
-Modern enterprise computing relies on cloud infrastructure control planes—such as Amazon Web Services (AWS), Google Cloud Platform (GCP), Microsoft Azure, and Infrastructure-as-Code (IaC) orchestrators like Terraform—to manage compute instances, relational databases, object storage, and Virtual Private Cloud (VPC) network topologies \cite{ayers2018}, \cite{jiang2026}, \cite{hadary2020}. Managing these complex deployments requires executing multi-step operational workflows via RESTful APIs, CLI tools, and automated continuous integration pipelines \cite{cortez2017}, \cite{huye2023}. As cloud architectures expand in heterogeneity and scale, human operational overhead has surged, driving the widespread adoption of agentic Artificial Intelligence (AI) frameworks \cite{yang2024}, \cite{hong2024}.
 
-Autonomous AI agents—Large Language Model (LLM)-powered software systems capable of iterative goal reasoning, action planning, context retrieval, and external tool invocation \cite{schick2023}, \cite{yao2023}, \cite{shavit2023}—are increasingly authorized to manage live cloud infrastructure. These agents automate incident remediation, database auto-scaling, log analysis, and IaC template generation \cite{lange2025}, \cite{novikov2025}. Unlike pre-scripted automation pipelines, autonomous agents dynamically generate execution graphs to fulfill natural language operational instructions.
+\subsection{Motivation and Context}
+Modern enterprise computing relies heavily on cloud infrastructure control planes—such as Amazon Web Services (AWS), Google Cloud Platform (GCP), Microsoft Azure, and Infrastructure-as-Code (IaC) orchestrators like Terraform and Ansible—to provision compute instances, relational databases, object storage, and Virtual Private Cloud (VPC) network topologies \cite{ayers2018}, \cite{jiang2026}, \cite{hadary2020}. Managing these modern microservice deployments requires executing complex multi-step operational tasks via RESTful APIs, CLI tools, and automated continuous integration pipelines \cite{cortez2017}, \cite{huye2023}. As cloud architectures expand in heterogeneity and operational scale, human operations teams face overwhelming cognitive load, driving the widespread adoption of agentic Artificial Intelligence (AI) frameworks \cite{yang2024}, \cite{hong2024}.
 
-However, granting autonomous agents direct, unmediated access to cloud control planes introduces three fundamental structural security failure modes:
+Autonomous AI agents—Large Language Model (LLM)-powered software systems capable of iterative goal reasoning, action planning, context retrieval, and external tool invocation \cite{schick2023}, \cite{yao2023}, \cite{shavit2023}—are increasingly granted direct API access to manage live enterprise cloud environments. These agents automate incident remediation, database auto-scaling, application log diagnosis, and IaC template generation \cite{lange2025}, \cite{novikov2025}. Unlike pre-scripted, deterministic automation workflows, autonomous agents dynamically generate execution plan graphs to accomplish high-level natural language instructions.
+
+\subsection{The Dilemma of Static IAM in Agentic Workflows}
+However, granting autonomous agents direct, unmediated access to cloud control planes introduces fundamental security failure modes. Cloud Identity and Access Management (IAM) systems are built around static policy assignment to IAM users, service roles, or container service accounts. Static IAM policies assume predictable, well-defined service boundaries.
+
+When applied to autonomous LLM agents, static IAM policies create an insurmountable security dilemma:
+\begin{itemize}
+    \item \textbf{Over-Provisioning Hazard}: Granting broad permissions (e.g., \texttt{AdministratorAccess} or wildcard \texttt{s3:*}) ensures that the agent can autonomously complete diverse, multi-step operational tasks without encountering authorization errors. However, this leaves the entire cloud infrastructure vulnerable to catastrophic deletion if the agent hallucinates, exhibits scope creep, or is compromised by an adversary.
+    \item \textbf{Under-Provisioning Failure}: Restricting IAM permissions prevents unauthorized actions, but causes frequent runtime execution failures whenever an LLM dynamically selects an alternative valid tool path or auxiliary read command to fulfill a legitimate user objective.
+\end{itemize}
+
+\subsection{Three Structural Security Failure Modes}
+Unmediated AI agent interaction with cloud APIs results in three primary structural vulnerabilities:
 \begin{enumerate}
-    \item \textbf{Violation of Least Privilege (\textit{Static Over-Provisioning})}: Cloud IAM relies on static policy assignment to service roles. To enable an agent to perform diverse operational tasks, operators frequently grant broad permissions (e.g., \texttt{AdministratorAccess} or wildcard \texttt{s3:*}). Consequently, an agent instructed to "check database health" retains permission to terminate production EC2 instances or delete IAM security groups \cite{perez2023}.
-    \item \textbf{Vulnerability to Indirect Prompt Injection}: Agents process untrusted external data (e.g., application log files, git commit messages, or web scraping inputs). Adversaries can embed malicious prompt payloads within these inputs, coercing the agent into executing off-scope or destructive cloud API commands \cite{perez2023}, \cite{shavit2023}.
-    \item \textbf{Absence of Session-Level Identity Attribution}: Cloud API logs (e.g., AWS CloudTrail) record only the static IAM role assumed by the agent container. They fail to bind individual API requests to specific agent instances, session UUIDs, declared user objectives, or underlying LLM reasoning chains, frustrating post-incident forensics.
+    \item \textbf{Violation of Principle of Least Privilege (\textit{Static Over-Provisioning})}: Agents operating under broad static service roles retain permission to execute highly destructive actions unrelated to their current operational objective. For example, an agent tasked with "monitoring database disk health" retains the IAM permission to terminate production EC2 virtual machines or delete IAM security groups \cite{perez2023}.
+    \item \textbf{Vulnerability to Indirect Prompt Injection}: Agents process untrusted external data sources, including application log files, git commit messages, S3 object metadata, or web scraping inputs. Adversaries can embed malicious prompt payloads within these inputs, coercing the agent into executing off-scope or destructive cloud API commands \cite{perez2023}, \cite{shavit2023}.
+    \item \textbf{Absence of Session-Level Identity Attribution}: Standard cloud API logs (e.g., AWS CloudTrail) record only the static IAM role assumed by the agent container. They fail to bind individual API requests to specific agent instances, session UUIDs, declared user objectives, or underlying LLM reasoning chains, frustrating post-incident digital forensics.
 \end{enumerate}
 
-To address these vulnerabilities, security engineers have evaluated existing policy enforcement mechanisms, such as static Role-Based Access Control (RBAC), Open Policy Agent (OPA), AWS Cedar, and LLM text-guardrails like NVIDIA NeMo Guardrails. However, as summarized in Table \ref{tab:systemic_comparison}, all existing access control paradigms fail to satisfy the combined requirements of pre-execution task-aware permission compilation, sub-200ms processing overhead, and runtime identity binding for cloud API operations.
+To mitigate these vulnerabilities, security engineers have evaluated existing policy enforcement mechanisms, such as static Role-Based Access Control (RBAC), Open Policy Agent (OPA), AWS Cedar, and LLM text-guardrails like NVIDIA NeMo Guardrails. However, as summarized in Table \ref{tab:systemic_comparison}, all existing access control paradigms fail to satisfy the combined requirements of pre-execution task-aware permission compilation, sub-200ms processing overhead, and runtime identity binding for cloud API operations.
 
 \begin{table*}[t]
 \caption{Systemic Comparison of Access Control Paradigms for Autonomous AI Agents in Cloud Infrastructure}
@@ -106,7 +117,7 @@ RIVA (2026) & \textbf{No} (Post-hoc Drift) & \textbf{No} & \textbf{N/A} & \textb
 }
 \end{table*}
 
-\subsection{Novelty Claim and Main Contributions}
+\subsection{Novelty Claim and Main Scientific Contributions}
 We introduce \textbf{ScopeGuard}, an asynchronous, identity-scoped authorization proxy and execution control framework designed specifically for autonomous AI agents operating in cloud infrastructure. ScopeGuard intercepts outbound agent tool requests, redacts sensitive credentials, injects verifiable session identity metadata, dynamically compiles a minimal permission boundary from the agent's declared task objective, and enforces a fail-closed policy prior to cloud API execution.
 
 \textbf{Novelty Claim:} ScopeGuard is the \textit{first working, empirically validated implementation} of task-scoped dynamic permission enforcement and session-level identity attribution specifically built for cloud-connected AI agents, evaluated against a comprehensive 200-task security benchmark suite across live cloud control planes.
@@ -120,29 +131,35 @@ The key scientific and technical contributions of this work are:
     \item \textbf{Real AWS Cloud Endpoint Validation}: Verification against live Amazon Web Services (AWS) endpoints (Amazon RDS, EC2, S3, CloudWatch) in \texttt{us-east-1}, proving an \textbf{100.0\% adversarial block rate} and \textbf{97.8\% precision} with only \textbf{108.9 ms latency overhead}.
 \end{itemize}
 
-\section{Background and Threat Model}\label{sec:background}
+\section{Background and Threat Taxonomy}\label{sec:background}
 
-\subsection{Cloud Control Planes and IAM Limits}
-Cloud infrastructure control planes manage underlying resources via RESTful API endpoints. For example, AWS IAM evaluates access using JSON policy documents containing \texttt{Effect}, \texttt{Principal}, \texttt{Action}, \texttt{Resource}, and \texttt{Condition} statements. Static IAM permissions assume predictable, well-defined service boundaries.
-
-When applied to autonomous LLM agents, static IAM policies create a fundamental trade-off:
-\begin{itemize}
-    \item \textbf{Over-Provisioning}: Granting broad permissions ensures agents complete complex workflows without authorization errors, but leaves the infrastructure vulnerable to catastrophic destruction if the agent is compromised by prompt injection.
-    \item \textbf{Under-Provisioning}: Restricting IAM permissions prevents unauthorized actions, but causes frequent agent execution failures whenever an LLM dynamically selects a non-standard tool path to accomplish a legitimate task.
-\end{itemize}
+\subsection{Anatomy of Autonomous Cloud Agents}
+Autonomous AI agents operate via iterative reasoning loops, such as the ReAct (Reasoning + Acting) framework \cite{yao2023}. At each execution step $t$, the agent receives a prompt tuple $P_t = \langle T_{\text{user}}, H_{t-1}, O_{t-1} \rangle$, where $T_{\text{user}}$ represents the user's natural language objective, $H_{t-1}$ is the historical trajectory of thoughts and actions, and $O_{t-1}$ is the observation output from the preceding tool invocation. The agent invokes an LLM to generate a thought $c_t$ and an action command $a_t$. The action command specifies a tool name and parameters (e.g., `aws_rds_operation(action="rds:DescribeDBInstances")`).
 
 \subsection{Formal Threat Model}
-We define a formal threat model $\mathcal{M}_{\text{threat}}$ encompassing six distinct attack vectors targeting cloud-connected AI agents:
+We define a formal security threat model $\mathcal{M}_{\text{threat}}$ governing AI agent cloud interactions. The threat model assumes:
 \begin{enumerate}
-    \item \textbf{Scope Creep (Off-Scope Action Execution)}: The agent attempts API calls outside its declared objective (e.g., executing \texttt{s3:DeleteBucket} during a read-only database health monitoring task).
-    \item \textbf{Direct Prompt Injection}: An attacker directly manipulates the user prompt to force the agent to execute unauthorized cloud API commands.
-    \item \textbf{Indirect Log/Input Injection}: An attacker embeds malicious prompt payloads inside untrusted external inputs (e.g., application log files or S3 object metadata) that are subsequently ingested and parsed by the agent.
-    \item \textbf{Privilege Escalation}: The agent attempts to modify IAM policy definitions or attach administrative roles to itself (\texttt{iam:PutRolePolicy}, \texttt{iam:AttachRolePolicy}).
-    \item \textbf{Resource Destruction}: The agent attempts irreversible deletion of critical infrastructure components (\texttt{ec2:TerminateInstances}, \texttt{rds:DeleteDBInstance}).
-    \item \textbf{Unauthorized Ingress Security Expansion}: The agent opens internal infrastructure security groups to global internet access (\texttt{ec2:AuthorizeSecurityGroupIngress} with \texttt{0.0.0.0/0}).
+    \item \textbf{Attacker Capabilities}: The adversary can submit arbitrary natural language user prompts or manipulate untrusted data inputs (logs, code repos, S3 metadata) ingested by the agent. The adversary cannot modify ScopeGuard's internal code or proxy configuration.
+    \item \textbf{Agent Trust Stance}: The agent's LLM is treated as an untrusted reasoning component susceptible to hallucinations, prompt injections, and scope creep.
+    \item \textbf{Proxy Stance}: ScopeGuard operates as a trusted, fail-closed intermediary positioned between the agent container and the cloud control plane API.
 \end{enumerate}
 
-\section{ScopeGuard Architecture and Implementation}\label{sec:architecture}
+\subsection{Ten Security Threat Categories}
+We establish a taxonomy of ten security threat categories targeting cloud AI agents:
+\begin{enumerate}
+    \item \textbf{Scope Creep (Off-Scope Action Execution)}: The agent attempts API calls unrelated to its stated task (e.g., deleting S3 storage buckets during a read-only database health monitoring task).
+    \item \textbf{Direct Prompt Injection}: An attacker manipulates the user prompt to force unauthorized execution.
+    \item \textbf{Indirect Log/Input Injection}: An attacker embeds malicious prompt payloads inside untrusted external inputs (e.g., application log files or S3 object metadata) that are parsed by the agent.
+    \item \textbf{IAM Privilege Escalation}: The agent attempts to attach administrative IAM policies (\texttt{iam:PutRolePolicy}, \texttt{iam:AttachRolePolicy}).
+    \item \textbf{Irreversible Resource Destruction}: The agent attempts irreversible deletion of critical infrastructure components (\texttt{ec2:TerminateInstances}, \texttt{rds:DeleteDBInstance}).
+    \item \textbf{Unauthorized Ingress Security Expansion}: The agent opens internal infrastructure security groups to global internet access (\texttt{ec2:AuthorizeSecurityGroupIngress} with \texttt{0.0.0.0/0}).
+    \item \textbf{Unauthorized Secret and Credential Exfiltration}: The agent attempts to read or transmit API secrets, database passwords, or private SSH keys.
+    \item \textbf{Cross-Resource / Cross-Tenant Scope Leakage}: The agent accesses infrastructure resources belonging to distinct tenant isolation environments.
+    \item \textbf{Denial-of-Wallet & Infinite Loop Resource Exhaustion}: The agent generates runaway resource provisioning commands (e.g., spinning up hundreds of GPU instances).
+    \item \textbf{Audit Log Tampering & Bypassing}: The agent attempts to disable CloudTrail or delete proxy audit logs.
+\end{enumerate}
+
+\section{ScopeGuard Architecture and System Design}\label{sec:architecture}
 
 ScopeGuard operates as an asynchronous HTTP reverse proxy server built on FastAPI and Python \texttt{asyncio}. It intercepts outbound tool calls sent to the \texttt{POST /execute-tool} endpoint.
 
@@ -172,7 +189,7 @@ ScopeGuard operates as an asynchronous HTTP reverse proxy server built on FastAP
 \label{fig:ablation_performance}
 \end{figure}
 
-\subsection{Core Subsystems}
+\subsection{Core Functional Subsystems}
 ScopeGuard comprises four core functional modules:
 \begin{enumerate}
     \item \textbf{Outbound Request Interceptor}: Intercepts JSON tool invocation payloads, extracts agent execution context, and validates structural schemas.
@@ -217,13 +234,15 @@ Listing \ref{lst:execute_tool_payload} shows an intercepted tool execution reque
 }
 \end{lstlisting}
 
-\section{Formalization and Algorithmic Design}\label{sec:formalization}
+\section{Dynamic Task-to-Scope Compiler}\label{sec:compiler}
 
 Let $\mathcal{A}$ denote the set of cloud API actions in the taxonomy. An incoming tool request $Q$ is defined as:
 \begin{equation}
 Q = \langle \text{agent\_id}, \text{session\_id}, T_{\text{decl}}, a_{\text{req}}, P \rangle
 \end{equation}
 where $T_{\text{decl}}$ is the declared task objective string, $a_{\text{req}} \in \mathcal{A}$ is the requested cloud API action, and $P$ is the parameter payload dictionary.
+
+The Task-to-Scope Compiler maps natural language task strings $T_{\text{decl}}$ to a minimal set of permitted actions $S_{\text{allowed}} \subseteq \mathcal{A}$. It tokenizes $T_{\text{decl}}$, matches n-gram keyphrases against the structured taxonomy \texttt{permissions.json}, and expands the permitted scope via implicit read-grant inheritance (e.g., write operations automatically grant corresponding describe/list permissions).
 
 \begin{algorithm}[t]
 \caption{Task-to-Scope Permission Compilation}
@@ -253,6 +272,10 @@ where $T_{\text{decl}}$ is the declared task objective string, $a_{\text{req}} \
 \RETURN $\langle S_{\text{allowed}}, R \rangle$
 \end{algorithmic}
 \end{algorithm}
+
+\section{Fail-Closed Policy Enforcement Engine}\label{sec:policy_engine}
+
+ScopeGuard enforces policy decisions under a strict fail-closed security posture. Algorithm \ref{alg:policy_evaluation} details the execution evaluation flow across the three operational ablation modes: \textit{passthrough}, \textit{tagging\_only}, and \textit{full}.
 
 \begin{algorithm}[t]
 \caption{ScopeGuard Fail-Closed Policy Evaluation}
@@ -382,21 +405,25 @@ ScopeGuard was validated live against real Amazon Web Services (AWS) control pla
 
 \FloatBarrier
 
-\section{Discussion and Related Work}\label{sec:discussion}
+\section{Security Analysis and Related Work}\label{sec:discussion}
 Existing access control systems fail to address the non-deterministic execution nature of LLM autonomous agents. Static IAM policies over-provision permissions, while OPA and AWS Cedar enforce static declarative policies that require human engineers to anticipate every potential query structure beforehand.
 
 In contrast, ScopeGuard provides dynamic, task-aware permission compilation prior to execution. By combining keyword tokenization with implicit read-grant inheritance, secret sanitization, and session UUID attribution, ScopeGuard establishes a robust security posture without adding significant latency or breaking developer workflows.
 
-\section{Conclusion and Future Work}\label{sec:conclusion}
+\section{Production Deployment Architectures}\label{sec:production}
+ScopeGuard can be deployed as an Envoy sidecar proxy within containerized Kubernetes clusters (EKS/GKE) or integrated as a central Cloud API Gateway proxy layer.
+
+\section{Conclusion and Future Research Roadmap}\label{sec:conclusion}
 In this paper, we introduced \textbf{ScopeGuard}, an identity-scoped execution control and dynamic authorization proxy for autonomous AI agents in cloud infrastructure. ScopeGuard addresses the structural vulnerabilities of static cloud IAM, indirect prompt injection, and untracked agent executions by dynamically compiling task-specific permission boundaries and enforcing fail-closed policy authorization prior to cloud API execution.
 
 Our empirical evaluation across a 200-task security benchmark suite (600 total tool evaluations) demonstrated that ScopeGuard in full enforcement mode achieves an overall classification accuracy of \textbf{98.9\%}, an adversarial block rate of \textbf{100.0\%} ($88/88$ attacks blocked, 0 false negatives), and a precision of \textbf{97.8\%}, while incurring a minimal average proxy latency overhead of \textbf{108.9 ms}. Live execution tests against Amazon Web Services (RDS, EC2, S3, CloudWatch) confirmed its real-world operational viability.
 
-Future work will expand ScopeGuard along three key dimensions:
+Future work will expand ScopeGuard along four key dimensions:
 \begin{enumerate}
     \item \textbf{Semantic Embedding-Based Scope Inference}: Transitioning from keyword tokenization to dense vector embedding similarity for taxonomy compilation.
     \item \textbf{Kubernetes Sidecar & Envoy Integration}: Packaging ScopeGuard as a cloud-native sidecar proxy for containerized agent workloads in EKS and GKE.
     \item \textbf{Cryptographic Reasoning Verification}: Integrating zero-knowledge cryptographic proofs to bind LLM reasoning chain steps directly to policy evaluation decisions.
+    \item \textbf{eBPF Kernel Interception}: Intercepting socket-level agent API calls using eBPF probes for zero-overhead system governance.
 \end{enumerate}
 
 \FloatBarrier
