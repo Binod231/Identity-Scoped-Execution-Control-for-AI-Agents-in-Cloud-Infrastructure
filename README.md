@@ -3,14 +3,14 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-green.svg)](https://fastapi.tiangolo.com/)
-[![Publication: Zenodo](https://img.shields.io/badge/Publication-Zenodo--Open--Access-blue.svg)](https://zenodo.org)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21792610.svg)](https://doi.org/10.5281/zenodo.21792610)
 
 **ScopeGuard** is an identity-scoped execution control and dynamic authorization proxy for autonomous AI agents in cloud infrastructure.
 
 > **Research Manuscript**:  
 > **ScopeGuard: Identity-Scoped Execution Control and Dynamic Permission Authorization for Autonomous AI Agents in Cloud Infrastructure**  
 > *Author*: Binod Prasad Joshi | *ORCID*: [0009-0007-6807-235X](https://orcid.org/0009-0007-6807-235X)  
-> *Published*: Zenodo Open Access Preprint (August 2026)
+> *Published*: [Zenodo Open Access Preprint (DOI: 10.5281/zenodo.21792610)](https://doi.org/10.5281/zenodo.21792610) (August 2026)
 
 ---
 
