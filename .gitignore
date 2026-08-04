@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+eggs/
+*.egg
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+
+# Docker
+volume/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Experiment results (reproduced by running experiments)
+experiments/results/*.csv
+experiments/results/*.png
+experiments/results/*.json
+data/*.db
+data/*.csv
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+# Logs
+*.log
+
+# Coverage
+.coverage
+htmlcov/

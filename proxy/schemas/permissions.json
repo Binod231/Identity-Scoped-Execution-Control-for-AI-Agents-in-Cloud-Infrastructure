@@ -1,0 +1,93 @@
+{
+  "meta": {
+    "description": "ScopeGuard Action Taxonomy — maps resource types to CRUD actions, risk levels, and keywords.",
+    "version": "1.0.0"
+  },
+  "resource_types": {
+    "s3": {
+      "actions": {
+        "s3:CreateBucket": {"risk": "MEDIUM", "op": "create", "kw": ["create bucket", "new bucket", "s3 bucket", "provision bucket", "set up bucket", "make bucket"]},
+        "s3:DeleteBucket": {"risk": "HIGH", "op": "delete", "kw": ["delete bucket", "remove bucket", "destroy bucket"]},
+        "s3:PutObject": {"risk": "MEDIUM", "op": "create", "kw": ["upload", "put object", "store file", "write to s3", "save to bucket"]},
+        "s3:GetObject": {"risk": "LOW", "op": "read", "kw": ["download", "get object", "read from s3", "fetch file", "retrieve from bucket"]},
+        "s3:DeleteObject": {"risk": "MEDIUM", "op": "delete", "kw": ["delete object", "remove file", "delete from bucket"]},
+        "s3:ListBuckets": {"risk": "LOW", "op": "read", "kw": ["list buckets", "show buckets", "enumerate buckets"]},
+        "s3:ListObjects": {"risk": "LOW", "op": "read", "kw": ["list objects", "list files", "browse bucket"]},
+        "s3:PutBucketPolicy": {"risk": "HIGH", "op": "update", "kw": ["bucket policy", "set policy"]},
+        "s3:GetBucketPolicy": {"risk": "LOW", "op": "read", "kw": ["get bucket policy", "view policy"]}
+      }
+    },
+    "ec2": {
+      "actions": {
+        "ec2:RunInstances": {"risk": "MEDIUM", "op": "create", "kw": ["launch instance", "deploy ec2", "deploy an ec2", "run instance", "create instance", "spin up", "provision server", "ec2 instance"]},
+        "ec2:TerminateInstances": {"risk": "HIGH", "op": "delete", "kw": ["terminate instance", "kill instance", "destroy instance"]},
+        "ec2:StopInstances": {"risk": "MEDIUM", "op": "update", "kw": ["stop instance", "halt instance"]},
+        "ec2:StartInstances": {"risk": "LOW", "op": "update", "kw": ["start instance", "resume instance"]},
+        "ec2:DescribeInstances": {"risk": "LOW", "op": "read", "kw": ["describe instance", "list instances", "show instances", "check instance"]},
+        "ec2:CreateSecurityGroup": {"risk": "MEDIUM", "op": "create", "kw": ["create security group", "new security group"]},
+        "ec2:DeleteSecurityGroup": {"risk": "HIGH", "op": "delete", "kw": ["delete security group", "remove security group"]},
+        "ec2:AuthorizeSecurityGroupIngress": {"risk": "HIGH", "op": "update", "kw": ["allow ingress", "open port", "add inbound rule"]},
+        "ec2:CreateSubnet": {"risk": "MEDIUM", "op": "create", "kw": ["create subnet", "new subnet"]},
+        "ec2:DescribeSubnets": {"risk": "LOW", "op": "read", "kw": ["describe subnet", "list subnets"]},
+        "ec2:DescribeVpcs": {"risk": "LOW", "op": "read", "kw": ["describe vpc", "list vpcs"]},
+        "ec2:CreateVpc": {"risk": "MEDIUM", "op": "create", "kw": ["create vpc", "new vpc", "provision vpc"]},
+        "ec2:DeleteVpc": {"risk": "HIGH", "op": "delete", "kw": ["delete vpc", "destroy vpc"]}
+      }
+    },
+    "iam": {
+      "actions": {
+        "iam:CreateRole": {"risk": "HIGH", "op": "create", "kw": ["create role", "new iam role"]},
+        "iam:DeleteRole": {"risk": "CRITICAL", "op": "delete", "kw": ["delete role", "remove role"]},
+        "iam:CreatePolicy": {"risk": "HIGH", "op": "create", "kw": ["create policy", "new policy"]},
+        "iam:DeletePolicy": {"risk": "CRITICAL", "op": "delete", "kw": ["delete policy", "remove policy"]},
+        "iam:AttachRolePolicy": {"risk": "HIGH", "op": "update", "kw": ["attach policy", "add policy to role"]},
+        "iam:DetachRolePolicy": {"risk": "HIGH", "op": "update", "kw": ["detach policy", "remove policy from role"]},
+        "iam:CreateUser": {"risk": "HIGH", "op": "create", "kw": ["create user", "new iam user"]},
+        "iam:DeleteUser": {"risk": "CRITICAL", "op": "delete", "kw": ["delete user", "remove user"]},
+        "iam:PutRolePolicy": {"risk": "CRITICAL", "op": "update", "kw": ["put role policy", "inline policy", "admin access", "wildcard permission"]},
+        "iam:GetRole": {"risk": "LOW", "op": "read", "kw": ["get role", "describe role"]},
+        "iam:ListRoles": {"risk": "LOW", "op": "read", "kw": ["list roles", "show roles"]},
+        "iam:ListPolicies": {"risk": "LOW", "op": "read", "kw": ["list policies", "show policies"]},
+        "iam:GetPolicy": {"risk": "LOW", "op": "read", "kw": ["get policy", "view policy"]}
+      }
+    },
+    "rds": {
+      "actions": {
+        "rds:CreateDBInstance": {"risk": "MEDIUM", "op": "create", "kw": ["create database", "deploy rds", "provision database", "new db instance"]},
+        "rds:DeleteDBInstance": {"risk": "HIGH", "op": "delete", "kw": ["delete database", "destroy rds", "remove db"]},
+        "rds:ModifyDBInstance": {"risk": "MEDIUM", "op": "update", "kw": ["modify database", "update rds", "resize database"]},
+        "rds:DescribeDBInstances": {"risk": "LOW", "op": "read", "kw": ["describe database", "list databases", "show rds"]},
+        "rds:CreateDBSnapshot": {"risk": "LOW", "op": "create", "kw": ["create snapshot", "backup database"]},
+        "rds:DeleteDBSnapshot": {"risk": "MEDIUM", "op": "delete", "kw": ["delete snapshot", "remove snapshot"]},
+        "rds:RestoreDBInstanceFromDBSnapshot": {"risk": "MEDIUM", "op": "create", "kw": ["restore database", "restore from snapshot"]}
+      }
+    },
+    "cloudwatch": {
+      "actions": {
+        "cloudwatch:PutMetricAlarm": {"risk": "MEDIUM", "op": "create", "kw": ["create alarm", "set alarm", "cloudwatch alarm"]},
+        "cloudwatch:DeleteAlarms": {"risk": "HIGH", "op": "delete", "kw": ["delete alarm", "remove alarm"]},
+        "cloudwatch:DescribeAlarms": {"risk": "LOW", "op": "read", "kw": ["describe alarm", "list alarms"]},
+        "cloudwatch:GetMetricData": {"risk": "LOW", "op": "read", "kw": ["get metrics", "fetch metrics"]},
+        "logs:CreateLogGroup": {"risk": "MEDIUM", "op": "create", "kw": ["create log group", "set up logging"]},
+        "logs:DeleteLogGroup": {"risk": "HIGH", "op": "delete", "kw": ["delete log group", "remove logs"]},
+        "logs:PutRetentionPolicy": {"risk": "MEDIUM", "op": "update", "kw": ["set retention", "log retention"]},
+        "logs:DeleteRetentionPolicy": {"risk": "HIGH", "op": "delete", "kw": ["delete retention policy"]},
+        "logs:DescribeLogGroups": {"risk": "LOW", "op": "read", "kw": ["describe log groups", "list logs"]}
+      }
+    },
+    "lambda": {
+      "actions": {
+        "lambda:CreateFunction": {"risk": "MEDIUM", "op": "create", "kw": ["create function", "deploy lambda", "new lambda"]},
+        "lambda:DeleteFunction": {"risk": "HIGH", "op": "delete", "kw": ["delete function", "remove lambda"]},
+        "lambda:UpdateFunctionCode": {"risk": "MEDIUM", "op": "update", "kw": ["update function", "deploy code"]},
+        "lambda:InvokeFunction": {"risk": "MEDIUM", "op": "update", "kw": ["invoke function", "call lambda", "trigger function"]},
+        "lambda:GetFunction": {"risk": "LOW", "op": "read", "kw": ["get function", "describe lambda"]}
+      }
+    }
+  },
+  "meta_rules": {
+    "implicit_read_grant": true,
+    "high_risk_requires_explicit_match": true,
+    "deny_by_default": true
+  }
+}

@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "scopeguard"
+version = "0.1.0"
+description = "Identity-Scoped Execution Control for AI Agents in Cloud Infrastructure"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+authors = [
+    {name = "Binod Prasad Joshi"},
+]
+keywords = ["ai-agents", "cloud-security", "identity", "access-control", "infrastructure"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+    "Topic :: System :: Systems Administration",
+]
+
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.27.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.1.0",
+    "boto3>=1.34.0",
+    "aiosqlite>=0.20.0",
+    "httpx>=0.27.0",
+    "python-dotenv>=1.0.0",
+    "rich>=13.7.0",
+    "matplotlib>=3.8.0",
+    "pandas>=2.2.0",
+    "seaborn>=0.13.0",
+    "numpy>=1.26.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "httpx>=0.27.0",
+    "ruff>=0.3.0",
+]
+agent = [
+    "anthropic>=0.25.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Binod231/Identity-Scoped-Execution-Control-for-AI-Agents-in-Cloud-Infrastructure"
+Repository = "https://github.com/Binod231/Identity-Scoped-Execution-Control-for-AI-Agents-in-Cloud-Infrastructure"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = [
+    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
