@@ -17,8 +17,6 @@
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
-\definecolor{ieeeblue}{RGB}{0,51,102}
-\definecolor{ieeered}{RGB}{204,0,0}
 
 \lstdefinestyle{mystyle}{
     backgroundcolor=\color{backcolour},   
@@ -133,19 +131,7 @@ ScopeGuard functions as an asynchronous reverse proxy server implemented in Fast
 
 \begin{figure}[htbp]
 \centering
-\IfFileExists{fig_ablation.png}{%
-    \includegraphics[width=0.48\textwidth]{fig_ablation.png}%
-}{%
-    \begin{tabular}{|l|c|c|}
-    \hline
-    \textbf{Operational Mode} & \textbf{Adversarial Block Rate} & \textbf{Legitimate FPR} \\
-    \hline
-    Passthrough Mode & 0.0\% & 0.0\% \\
-    Tagging Only Mode & 0.0\% & 0.0\% \\
-    \textbf{ScopeGuard Full} & \textbf{88.0\%} & \textbf{2.0\%} \\
-    \hline
-    \end{tabular}
-}
+\includegraphics[width=0.48\textwidth]{fig_ablation.png}
 \caption{Empirical ablation performance comparison showing Adversarial Block Rate (\%) and Legitimate False Positive Rate (\%) across Passthrough, Tagging Only, and ScopeGuard Full enforcement modes.}
 \label{fig:ablation_performance}
 \end{figure}
@@ -229,40 +215,14 @@ We evaluate ScopeGuard across a 200-task benchmark suite (100 legitimate operati
 
 \begin{figure}[htbp]
 \centering
-\IfFileExists{fig_latency.png}{%
-    \includegraphics[width=0.48\textwidth]{fig_latency.png}%
-}{%
-    \begin{tabular}{|l|c|}
-    \hline
-    \textbf{Operational Mode} & \textbf{Mean Proxy Overhead (ms)} \\
-    \hline
-    Passthrough & 129.2 ms \\
-    Tagging Only & 111.2 ms \\
-    \textbf{ScopeGuard Full} & \textbf{108.9 ms} \\
-    \hline
-    \end{tabular}
-}
+\includegraphics[width=0.48\textwidth]{fig_latency.png}
 \caption{Mean execution latency overhead (ms) across ablation operational modes, confirming sub-110ms processing performance.}
 \label{fig:latency_overhead}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
-\IfFileExists{fig_confusion.png}{%
-    \includegraphics[width=0.45\textwidth]{fig_confusion.png}%
-}{%
-    \begin{table}[H]
-    \centering
-    \begin{tabular}{lcc}
-    \toprule
-    & \textbf{Pred: Blocked} & \textbf{Pred: Allowed} \\
-    \midrule
-    \textbf{Actual: Adversarial} & \textbf{TP = 88} & FN = 12 \\
-    \textbf{Actual: Legitimate}  & FP = 2 & \textbf{TN = 98} \\
-    \bottomrule
-    \end{tabular}
-    \end{table}
-}
+\includegraphics[width=0.45\textwidth]{fig_confusion.png}
 \caption{Empirical Confusion Matrix for ScopeGuard Full enforcement mode across 200 evaluation tasks.}
 \label{fig:confusion_matrix}
 \end{figure}
